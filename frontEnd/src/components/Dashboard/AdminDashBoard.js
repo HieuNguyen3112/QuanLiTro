@@ -5,7 +5,6 @@ import RoomTypeList from '../../features/RoomManagement/RoomTypeList';
 import RoomForm from '../../features/RoomManagement/RoomForm'; // Import RoomForm
 import Modal from '../Modal'; // Import Modal
 import ServiceList from '../../features/ServiceManagement/ServiceList';
-import MeterReading from '../../features/ServiceManagement/MeterReading';
 import ResidentManagement from '../../features/ResidentManagement';
 import ContractManagement from '../../features/ContractManagement';
 import BillManagement from '../../features/BillManagement';
@@ -41,8 +40,6 @@ const DashboardAdmin = () => {
         return <RoomTypeList />;
       case 'service-prices':
         return <ServiceList />;
-      case 'meter-readings':
-        return <MeterReading type={meterType} />;
       case 'residents':
         return <ResidentManagement />;
       case 'contracts':

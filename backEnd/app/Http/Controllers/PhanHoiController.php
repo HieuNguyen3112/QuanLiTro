@@ -163,4 +163,62 @@ class PhanHoiController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Gửi phản hồi từ người dùng.
+     */
+    public function storeFeedbackForUser(Request $request)
+    {
+        try {
+            // Lấy thông tin người dùng hiện tại từ token (nếu sử dụng Sanctum/JWT)
+            $user = auth()->user();
+
+            // Nếu không có thông tin người dùng, trả về lỗi
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Người dùng chưa đăng nhập.',
+                ], 401);
+            }
+
+            // Xác thực dữ liệu từ request
+            $validatedData = $request->validate([
+                'TieuDe' => 'required|string|max:255',
+                'NoiDung' => 'required|string',
+            ]);
+
+            // Tạo dữ liệu để lưu
+            $feedbackData = [
+                'NguoiGui' => $user->name, // Thông tin người gửi từ user
+                'Phong_id' => $user->phong_id ?? null, // Gắn ID phòng nếu có
+                'TieuDe' => $validatedData['TieuDe'],
+                'NoiDung' => $validatedData['NoiDung'],
+                'TrangThai' => 'Chờ xử lý', // Mặc định trạng thái
+            ];
+
+            // Lưu phản hồi
+            $phanHoi = PhanHoi::create($feedbackData);
+
+            // Trả về phản hồi vừa tạo
+            return response()->json([
+                'success' => true,
+                'message' => 'Gửi phản hồi thành công.',
+                'data' => $phanHoi,
+            ], 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Dữ liệu không hợp lệ.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi khi gửi phản hồi: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
+
 }

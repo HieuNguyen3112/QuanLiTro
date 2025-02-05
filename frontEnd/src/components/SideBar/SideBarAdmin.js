@@ -35,24 +35,7 @@ function SidebarAdmin({ onNavigate }) {
         { id: 'room-types', label: 'Loại Phòng', url: '/room-types' }
       ]
     },
-    {
-      id: 'services',
-      label: 'Quản lý dịch vụ',
-      icon: Settings,
-      hasSubmenu: true,
-      submenuItems: [
-        { id: 'service-prices', label: 'Bảng giá dịch vụ', url: '/services' },
-        {
-          id: 'meter-readings',
-          label: 'Cập nhật chỉ số',
-          hasSubmenu: true,
-          submenuItems: [
-            { id: 'electric-meter', label: 'Điện', icon: Zap, url: '/electric-meter' },
-            { id: 'water-meter', label: 'Nước', icon: Droplet, url: '/water-meter' }
-          ]
-        }
-      ]
-    },
+    { id: 'service-prices', label: 'Quản lý dịch vụ', icon: Settings, hasSubmenu: false, url: '/services' },
     { id: 'residents', label: 'Quản lý cư dân', icon: Users, hasSubmenu: false, url: '/residents' },
     { id: 'contracts', label: 'Hợp đồng thuê', icon: FileText, hasSubmenu: false, url: '/contracts' },
     {

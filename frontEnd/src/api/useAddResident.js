@@ -14,7 +14,7 @@ const useAddResident = () => {
         residentData, 
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Gắn token xác thực
+            Authorization: token, // Gắn token xác thực
             "Content-Type": "application/json",
           },
         }

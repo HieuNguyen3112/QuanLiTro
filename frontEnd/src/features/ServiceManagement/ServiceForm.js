@@ -7,32 +7,29 @@ function ServiceForm({ service, onSubmit, onCancel }) {
   const { editService } = useEditService(); // API chỉnh sửa dịch vụ
 
   const [formData, setFormData] = useState({
-    Ten_dich_vu: "",
-    Gia: "",
-    Don_vi: "",
-    Loai_dich_vu: "Mặc định",
+    Ten_dich_vu: "", // Tên dịch vụ
+    Gia: "",          // Giá dịch vụ
+    Don_vi: "",       // Đơn vị tính
+    Loai_dich_vu: "Mặc định", // Loại dịch vụ
   });
-
-  const [isEdit, setIsEdit] = useState(false); // Trạng thái thêm mới hoặc chỉnh sửa
 
   // Load dữ liệu vào form khi nhận props "service"
   useEffect(() => {
     if (service) {
       setFormData({
-        Ten_dich_vu: service.Ten_dich_vu || "",
-        Gia: service.Gia !== undefined ? service.Gia : "",
-        Don_vi: service.Don_vi || "",
-        Loai_dich_vu: service.Loai_dich_vu || "Mặc định",
+        Ten_dich_vu: service.Ten_dich_vu || "", // Tên dịch vụ
+        Gia: service.Gia !== undefined ? service.Gia : "", // Giá dịch vụ
+        Don_vi: service.Don_vi || "", // Đơn vị tính
+        Loai_dich_vu: service.Loai_dich_vu || "Mặc định", // Loại dịch vụ
       });
-      setIsEdit(true);
     } else {
+      // Reset form cho chế độ "Thêm mới"
       setFormData({
         Ten_dich_vu: "",
         Gia: "",
         Don_vi: "",
         Loai_dich_vu: "Mặc định",
       });
-      setIsEdit(false);
     }
   }, [service]);
 
@@ -40,7 +37,7 @@ function ServiceForm({ service, onSubmit, onCancel }) {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: name === "Gia" ? parseFloat(value) || "" : value, // Chuyển đổi giá trị của Giá sang số
+      [name]: name === "Gia" ? parseFloat(value) || "" : value, // Convert "Gia" sang kiểu số
     }));
   };
 
@@ -55,7 +52,17 @@ function ServiceForm({ service, onSubmit, onCancel }) {
         Loai_dich_vu: formData.Loai_dich_vu,
       };
 
-      if (isEdit && service?.ID_DichVu) {
+      if (!updatedServiceData.Ten_dich_vu.trim()) {
+        alert("Tên dịch vụ không được để trống.");
+        return;
+      }
+
+      if (isNaN(updatedServiceData.Gia) || updatedServiceData.Gia <= 0) {
+        alert("Giá phải là số dương.");
+        return;
+      }
+
+      if (service?.ID_DichVu) {
         // Gọi API chỉnh sửa dịch vụ
         await editService(service.ID_DichVu, updatedServiceData);
       } else {
@@ -63,7 +70,7 @@ function ServiceForm({ service, onSubmit, onCancel }) {
         await addService(updatedServiceData);
       }
 
-      onSubmit(); // Gọi callback để cập nhật danh sách
+      onSubmit(); // Callback cập nhật danh sách
     } catch (error) {
       console.error("Lỗi khi lưu dịch vụ:", error.message);
       alert("Lỗi khi lưu dịch vụ: " + error.message);
@@ -73,7 +80,7 @@ function ServiceForm({ service, onSubmit, onCancel }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 bg-white p-6 rounded-lg shadow-md"
+      className="space-y-4 bg-white p-6 rounded-lg shadow-md w-full max-w-lg mx-auto"
     >
       <div className="form-group">
         <label htmlFor="Ten_dich_vu" className="block text-sm font-medium text-gray-700">
@@ -144,7 +151,7 @@ function ServiceForm({ service, onSubmit, onCancel }) {
           type="submit"
           className="bg-teal-700 text-white py-2 px-4 rounded-md hover:bg-teal-800"
         >
-          {isEdit ? "Cập nhật" : "Thêm mới"}
+          {service ? "Cập nhật" : "Thêm mới"}
         </button>
         <button
           type="button"

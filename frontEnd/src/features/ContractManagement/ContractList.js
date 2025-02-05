@@ -1,55 +1,129 @@
-import React, { useEffect, useState } from 'react';
-import { Edit, Trash2, Eye } from 'react-feather';
-import Modal from '../../components/Modal';
-import ContractForm from './ContractForm';
-import useFetchContracts from '../../api/useFetchContracts'; // Import custom hook
-import useDeleteContract from '../../api/useDeleteContract'; // Import API xóa hợp đồng
+import React, { useState } from "react";
+import { Edit, Trash2 } from "react-feather";
+import Modal from "../../components/Modal";
+import ContractForm from "./ContractForm";
 
 function ContractList() {
-  const { contracts, isLoading, fetchError, fetchContracts } = useFetchContracts();
-  const { deleteContract } = useDeleteContract(); // Gọi API xóa hợp đồng
+  const [contracts, setContracts] = useState([
+    {
+      ID_HopDong: 1,
+      phong_id: "101",
+      So_phong: "101",
+      cu_dan_id: 1,
+      Loai_hop_dong: "Cá nhân",
+      Ngay_bat_dau: "2024-01-01",
+      Ngay_ket_thuc: "2024-12-31",
+      Hieu_luc: true,
+      Tien_thue_hang_thang: 5000000,
+    },
+    {
+      ID_HopDong: 2,
+      phong_id: "102",
+      So_phong: "102",
+      cu_dan_id: 2,
+      Loai_hop_dong: "Cá nhân",
+      Ngay_bat_dau: "2024-01-01",
+      Ngay_ket_thuc: "2024-12-31",
+      Hieu_luc: true,
+      Tien_thue_hang_thang: 4500000,
+    },
+    {
+      ID_HopDong: 3,
+      phong_id: "105",
+      So_phong: "105",
+      cu_dan_id: 3,
+      Loai_hop_dong: "Công ty",
+      Ngay_bat_dau: "2024-01-01",
+      Ngay_ket_thuc: "2024-12-31",
+      Hieu_luc: true,
+      Tien_thue_hang_thang: 7000000,
+    },
+    {
+      ID_HopDong: 4,
+      phong_id: "107",
+      So_phong: "107",
+      cu_dan_id: 4,
+      Loai_hop_dong: "Cá nhân",
+      Ngay_bat_dau: "2024-01-01",
+      Ngay_ket_thuc: "2024-12-31",
+      Hieu_luc: true,
+      Tien_thue_hang_thang: 6000000,
+    },
+    {
+      ID_HopDong: 5,
+      phong_id: "110",
+      So_phong: "110",
+      cu_dan_id: 5,
+      Loai_hop_dong: "Công ty",
+      Ngay_bat_dau: "2024-01-01",
+      Ngay_ket_thuc: "2024-12-31",
+      Hieu_luc: true,
+      Tien_thue_hang_thang: 5500000,
+    },
+    {
+      ID_HopDong: 6,
+      phong_id: "117",
+      So_phong: "117",
+      cu_dan_id: 6,
+      Loai_hop_dong: "Cá nhân",
+      Ngay_bat_dau: "2024-01-01",
+      Ngay_ket_thuc: "2024-12-31",
+      Hieu_luc: true,
+      Tien_thue_hang_thang: 4700000,
+    },
+    {
+      ID_HopDong: 7,
+      phong_id: "118",
+      So_phong: "118",
+      cu_dan_id: 7,
+      Loai_hop_dong: "Công ty",
+      Ngay_bat_dau: "2024-01-01",
+      Ngay_ket_thuc: "2024-12-31",
+      Hieu_luc: true,
+      Tien_thue_hang_thang: 6800000,
+    },
+    {
+      ID_HopDong: 8,
+      phong_id: "121",
+      So_phong: "121",
+      cu_dan_id: 8,
+      Loai_hop_dong: "Cá nhân",
+      Ngay_bat_dau: "2024-01-01",
+      Ngay_ket_thuc: "2024-12-31",
+      Hieu_luc: true,
+      Tien_thue_hang_thang: 5200000,
+    },
+  ]);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingContract, setEditingContract] = useState(null);
-  const [viewingContract, setViewingContract] = useState(null);
 
-  useEffect(() => {
-    fetchContracts(); // Fetch dữ liệu hợp đồng khi component mount
-  }, []);
-
-  const openModal = (contract = null, isViewing = false) => {
-    if (isViewing) {
-      setViewingContract(contract);
-    } else {
-      setEditingContract(contract);
-    }
+  const openModal = (contract = null) => {
+    setEditingContract(contract);
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingContract(null);
-    setViewingContract(null);
   };
 
-  const handleSubmit = (formData) => {
-    console.log('Form data submitted:', formData);
-    closeModal();
-  };
-
-  const handleDelete = async (id) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa hợp đồng này?')) {
-      try {
-        await deleteContract(id); // Gọi API xóa hợp đồng
-        alert('Hợp đồng đã được xóa thành công.');
-        fetchContracts(); // Fetch lại danh sách hợp đồng
-      } catch (error) {
-        alert('Lỗi khi xóa hợp đồng: ' + error.message);
-      }
+  const handleDelete = (id) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa hợp đồng này?")) {
+      setContracts((prevContracts) => prevContracts.filter((c) => c.ID_HopDong !== id));
     }
   };
 
-  const handleToggleStatus = (id) => {
-    console.log(`Toggle status for contract ID: ${id}`);
+  const handleSubmit = (formData) => {
+    if (editingContract) {
+      setContracts((prevContracts) =>
+        prevContracts.map((c) => (c.ID_HopDong === editingContract.ID_HopDong ? { ...c, ...formData } : c))
+      );
+    } else {
+      const newContract = { ...formData, ID_HopDong: contracts.length + 1 };
+      setContracts((prevContracts) => [...prevContracts, newContract]);
+    }
+    closeModal();
   };
 
   return (
@@ -64,16 +138,13 @@ function ContractList() {
         </button>
       </div>
 
-      {isLoading && <p>Đang tải dữ liệu...</p>}
-      {fetchError && <p className="text-red-500">{fetchError}</p>}
-
       <div className="table-container">
         <table className="data-table">
           <thead>
             <tr>
-              <th>STT</th>
-              <th>Phòng số</th>
-              <th>Người thuê</th>
+              <th>ID phòng</th>
+              <th>Số phòng</th>
+              <th>ID Người thuê</th>
               <th>Loại hợp đồng</th>
               <th>Ngày bắt đầu</th>
               <th>Ngày kết thúc</th>
@@ -83,86 +154,37 @@ function ContractList() {
             </tr>
           </thead>
           <tbody>
-            {contracts.length > 0 ? (
-              contracts.map((contract, index) => (
-                <tr key={contract.ID_HopDong}>
-                  <td>{index + 1}</td>
-                  <td>{contract.phong_id}</td>
-                  <td>{contract.cu_dan_id || 'N/A'}</td>
-                  <td>{contract.Loai_hop_dong}</td>
-                  <td>{contract.Ngay_bat_dau}</td>
-                  <td>{contract.Ngay_ket_thuc}</td>
-                  <td>{parseInt(contract.Tien_thue_hang_thang || 0).toLocaleString()} VNĐ</td>
-                  <td>
-                    <div className="flex items-center justify-center">
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          className="sr-only peer"
-                          checked={contract.Hieu_luc === 1}
-                          onChange={() => handleToggleStatus(contract.ID_HopDong)}
-                        />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-teal-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-600"></div>
-                      </label>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="flex gap-2">
-                      <button
-                        className="action-button text-green-500 hover:text-green-700"
-                        onClick={() => openModal(contract, true)}
-                      >
-                        <Eye size={18} />
-                      </button>
-                      <button
-                        className="action-button text-blue-500 hover:text-blue-700"
-                        onClick={() => openModal(contract)}
-                      >
-                        <Edit size={18} />
-                      </button>
-                      <button
-                        className="action-button text-red-500 hover:text-red-700"
-                        onClick={() => handleDelete(contract.ID_HopDong)}
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="9">Không có hợp đồng nào.</td>
+            {contracts.map((contract) => (
+              <tr key={contract.ID_HopDong}>
+                <td>{contract.phong_id}</td>
+                <td>{contract.So_phong}</td>
+                <td>{contract.cu_dan_id}</td>
+                <td>{contract.Loai_hop_dong}</td>
+                <td>{contract.Ngay_bat_dau}</td>
+                <td>{contract.Ngay_ket_thuc}</td>
+                <td>{contract.Tien_thue_hang_thang.toLocaleString()} VNĐ</td>
+                <td>{contract.Hieu_luc ? "Có" : "Không"}</td>
+                <td>
+                  <div className="flex gap-2">
+                    <button className="text-blue-500 hover:text-blue-700" onClick={() => openModal(contract)}>
+                      <Edit size={18} />
+                    </button>
+                    <button className="text-red-500 hover:text-red-700" onClick={() => handleDelete(contract.ID_HopDong)}>
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                </td>
               </tr>
-            )}
+            ))}
           </tbody>
         </table>
       </div>
 
-      <Modal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        title={
-          viewingContract
-            ? 'Chi tiết hợp đồng'
-            : editingContract
-            ? 'Sửa hợp đồng'
-            : 'Thêm hợp đồng mới'
-        }
-      >
-        {viewingContract ? (
-          <div className="contract-details">
-            <p><strong>Phòng số:</strong> {viewingContract.phong_id}</p>
-            <p><strong>Người thuê:</strong> {viewingContract.cu_dan_id || 'N/A'}</p>
-            <p><strong>Loại hợp đồng:</strong> {viewingContract.Loai_hop_dong}</p>
-            <p><strong>Ngày bắt đầu:</strong> {viewingContract.Ngay_bat_dau}</p>
-            <p><strong>Ngày kết thúc:</strong> {viewingContract.Ngay_ket_thuc}</p>
-            <p><strong>Hiệu lực:</strong> {viewingContract.Hieu_luc ? 'Có' : 'Không'}</p>
-          </div>
-        ) : (
+      {isModalOpen && (
+        <Modal isOpen={isModalOpen} onClose={closeModal} title={editingContract ? "Sửa hợp đồng" : "Thêm hợp đồng mới"}>
           <ContractForm contract={editingContract} onSubmit={handleSubmit} onCancel={closeModal} />
-        )}
-      </Modal>
+        </Modal>
+      )}
     </div>
   );
 }

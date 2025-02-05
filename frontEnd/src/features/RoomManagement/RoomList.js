@@ -61,6 +61,7 @@ function RoomList() {
           <thead>
             <tr>
               <th>STT</th>
+              <th>ID phòng</th>
               <th>Số phòng</th>
               <th>Loại phòng</th>
               <th>Trạng thái</th>
@@ -75,6 +76,7 @@ function RoomList() {
               rooms.map((room, index) => (
                 <tr key={room.ID_Phong}>
                   <td>{index + 1}</td>
+                  <td>{room.ID_Phong}</td>
                   <td>{room.So_phong}</td>
                   <td>{room.Loai_phong_id}</td>
                   <td>

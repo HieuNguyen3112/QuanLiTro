@@ -13,7 +13,7 @@ const useDeleteResident = () => {
         `http://127.0.0.1:8000/api/cu-dan/${id}`, // Endpoint xóa cư dân
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Gắn token xác thực
+            Authorization: token, // Gắn token xác thực
           },
         }
       );

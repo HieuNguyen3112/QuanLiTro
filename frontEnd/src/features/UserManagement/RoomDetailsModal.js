@@ -12,7 +12,7 @@ const RoomDetailsModal = ({ isOpen, onClose, room }) => {
         <p className="text-gray-700 mb-2">{room.description}</p>
         <p className="text-gray-700 mb-2">Chi tiết: {room.details}</p>
         <p className="text-gray-700 mb-2">Giá: {room.price}</p>
-        <p className="text-gray-700 mb-2 font-bold">Đặt phòng liên hệ: 0977199231</p> {/* Thêm thông tin liên hệ */}
+        <p className="text-gray-700 mb-2 font-bold">Đăng nhập để đặt phòng</p> {/* Thêm thông tin liên hệ */}
         <button
           onClick={onClose}
           className="mt-4 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition duration-300"

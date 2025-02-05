@@ -1,27 +1,52 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '../components/Button'; // Import component Button
+import useRegister from '../api/useRegister'; // Import file useRegister.js
 
 const RegisterPage = () => {
+  const { registerUser } = useRegister();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ username: '', password: '', confirmPassword: '', email: '' });
+  const [formData, setFormData] = useState({ username: '', password: '', confirmPassword: '' });
+  const [errorMessage, setErrorMessage] = useState(''); // Thêm state để hiển thị lỗi
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Xử lý logic đăng ký ở đây
-    console.log('Registration submitted:', formData);
-    navigate('/login');
+    setErrorMessage(''); // Xóa thông báo lỗi trước khi xử lý mới
+
+    if (formData.password !== formData.confirmPassword) {
+      setErrorMessage('Mật khẩu và xác nhận mật khẩu không khớp.');
+      return;
+    }
+
+    try {
+      // Gửi yêu cầu đăng ký qua API
+      await registerUser({
+        Username: formData.username,
+        Password: formData.password,
+        Password_confirmation: formData.confirmPassword, // Thêm trường xác nhận mật khẩu
+      });
+
+      alert('Đăng ký thành công!');
+      navigate('/login'); // Chuyển hướng đến trang đăng nhập
+    } catch (error) {
+      setErrorMessage(error.message); // Hiển thị lỗi nếu có
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100">
       <div className="bg-white rounded-lg shadow-md p-8 w-full max-w-md">
         <h1 className="text-3xl font-bold text-teal-600 mb-4">Đăng ký</h1>
+        {errorMessage && (
+          <div className="mb-4 text-sm text-red-600">
+            {errorMessage}
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="username" className="block text-sm font-medium text-gray-700">Tên đăng nhập</label>
@@ -35,7 +60,6 @@ const RegisterPage = () => {
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
             />
           </div>
-          
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700">Mật khẩu</label>
             <input

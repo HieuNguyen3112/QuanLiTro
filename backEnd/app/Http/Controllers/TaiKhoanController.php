@@ -223,6 +223,43 @@ class TaiKhoanController extends Controller
         }
     }
 
+    /**
+     * Đăng ký tài khoản mới.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function register(Request $request)
+    {
+        try {
+            // Xác thực dữ liệu đầu vào
+            $validatedData = $request->validate([
+                'Username' => 'required|string|unique:tai_khoan,Username|max:255',
+                'Password' => 'required|string|min:6|confirmed', // Yêu cầu xác nhận mật khẩu
+            ]);
+
+            // Gán giá trị mặc định cho các trường không có trong request
+            $validatedData['LoaiTaiKhoan'] = 'resident';
+            $validatedData['Password'] = bcrypt($validatedData['Password']); // Mã hóa mật khẩu
+            $validatedData['CuDan_id'] = null;
+
+            // Tạo tài khoản mới
+            $taiKhoan = TaiKhoan::create($validatedData);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Đăng ký tài khoản thành công.',
+                'data' => $taiKhoan,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi khi đăng ký tài khoản: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
 
     /**
      * Lấy thông tin người dùng hiện tại.
@@ -237,7 +274,7 @@ class TaiKhoanController extends Controller
         ]);
     }
 
-        /**
+    /**
      * Refresh token.
      *
      * @return \Illuminate\Http\JsonResponse
@@ -268,7 +305,6 @@ class TaiKhoanController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    
     public function changePassword(Request $request)
     {
         try {
@@ -298,14 +334,13 @@ class TaiKhoanController extends Controller
                 'message' => 'Đổi mật khẩu thành công.',
             ]);
         } catch (\Exception $e) {
-            Log::error('Lỗi khi đổi mật khẩu', ['error' => $e->getMessage()]);
-
             return response()->json([
                 'success' => false,
                 'message' => 'Lỗi khi đổi mật khẩu: ' . $e->getMessage(),
             ], 500);
         }
     }
+
 
     /**
      * Cập nhật CuDan_id cho tài khoản.

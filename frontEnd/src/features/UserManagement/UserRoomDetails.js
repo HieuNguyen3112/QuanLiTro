@@ -1,14 +1,13 @@
 import React from 'react';
 
 const UserRoomDetails = () => {
-  // Dữ liệu mẫu về phòng của người dùng
+  // Dữ liệu tĩnh của phòng 102
   const userRoom = {
-    roomNumber: '101',
-    roomType: 'VIP',
-    bedCount: 2,
+    roomNumber: "103",
+    roomType: "VIP",
+    bedCount: 1,
     fridgeCount: 1,
     acCount: 1,
-    description: 'Phòng rộng rãi, thoáng mát với đầy đủ tiện nghi.'
   };
 
   return (
@@ -26,10 +25,6 @@ const UserRoomDetails = () => {
             <li>Số tủ lạnh: {userRoom.fridgeCount}</li>
             <li>Số điều hòa: {userRoom.acCount}</li>
           </ul>
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold">Mô tả</h3>
-          <p className="text-gray-700">{userRoom.description}</p>
         </div>
       </div>
     </div>

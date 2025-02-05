@@ -13,7 +13,7 @@ const useDeleteContract = () => {
         `http://127.0.0.1:8000/api/hop-dong/${id}`, // Endpoint xóa hợp đồng
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Token xác thực
+            Authorization: token, // Token xác thực
             "Content-Type": "application/json",
           },
         }

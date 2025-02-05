@@ -1,37 +1,35 @@
 import React, { useState, useEffect } from "react";
-import useAddContract from "../../api/useAddContract"; // Import useAddContract
 
 function ContractForm({ contract, onSubmit, onCancel }) {
-  const { addContract } = useAddContract(); // Gọi hàm addContract từ hook
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Khởi tạo dữ liệu form
   const [formData, setFormData] = useState({
-    roomNumber: "",
-    tenant: "",
-    contractType: "",
-    startDate: "",
-    endDate: "",
-    isActive: true,
-    depositAmount: "",
-    monthlyRent: "",
+    phong_id: "",
+    cu_dan_id: "",
+    Loai_hop_dong: "",
+    Ngay_bat_dau: "",
+    Ngay_ket_thuc: "",
+    Hieu_luc: true,
+    Tien_thue_hang_thang: "",
   });
 
-  // Cập nhật dữ liệu nếu có thông tin hợp đồng cũ
+  // Khi nhận thông tin hợp đồng để chỉnh sửa, cập nhật form
   useEffect(() => {
     if (contract) {
       setFormData({
-        roomNumber: contract.phong_so || "",
-        tenant: contract.nguoi_thue || "",
-        contractType: contract.loai_hop_dong || "",
-        startDate: contract.ngay_bat_dau || "",
-        endDate: contract.ngay_ket_thuc || "",
-        isActive: contract.hieu_luc || false,
-        depositAmount: contract.tien_dat_coc || "",
-        monthlyRent: contract.tien_thue_hang_thang || "",
+        phong_id: contract.phong_id || "",
+        cu_dan_id: contract.cu_dan_id || "",
+        Loai_hop_dong: contract.Loai_hop_dong || "",
+        Ngay_bat_dau: contract.Ngay_bat_dau || "",
+        Ngay_ket_thuc: contract.Ngay_ket_thuc || "",
+        Hieu_luc: contract.Hieu_luc || false,
+        Tien_thue_hang_thang: contract.Tien_thue_hang_thang || "",
       });
     }
   }, [contract]);
 
+  // Xử lý khi có thay đổi trên form
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prevData) => ({
@@ -40,66 +38,64 @@ function ContractForm({ contract, onSubmit, onCancel }) {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  // Xử lý khi submit form
+  const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Chuyển đổi formData thành key phù hợp với backend
     const formattedData = {
-      phong_so: formData.roomNumber,
-      nguoi_thue: formData.tenant,
-      loai_hop_dong: formData.contractType,
-      ngay_bat_dau: formData.startDate,
-      ngay_ket_thuc: formData.endDate,
-      hieu_luc: formData.isActive,
-      tien_dat_coc: formData.depositAmount,
-      tien_thue_hang_thang: formData.monthlyRent,
+      phong_id: formData.phong_id,
+      cu_dan_id: formData.cu_dan_id,
+      Loai_hop_dong: formData.Loai_hop_dong,
+      Ngay_bat_dau: formData.Ngay_bat_dau,
+      Ngay_ket_thuc: formData.Ngay_ket_thuc || null,
+      Hieu_luc: formData.Hieu_luc,
+      Tien_thue_hang_thang: formData.Tien_thue_hang_thang,
     };
 
-    try {
-      await addContract(formattedData); // Gọi API thêm hợp đồng
-      alert("Thêm hợp đồng thành công!");
-      onSubmit(); // Callback để làm mới danh sách hoặc đóng modal
-    } catch (error) {
-      console.error("Lỗi khi thêm hợp đồng:", error.message);
-      alert("Lỗi khi thêm hợp đồng: " + error.message);
-    } finally {
-      setIsSubmitting(false);
-    }
+    // Gửi dữ liệu lên callback `onSubmit`
+    onSubmit(formattedData);
+    setIsSubmitting(false);
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-lg shadow-md">
       <div className="form-group">
-        <label htmlFor="roomNumber" className="block text-sm font-medium text-gray-700">Phòng số:</label>
+        <label htmlFor="phong_id" className="block text-sm font-medium text-gray-700">
+          Phòng số:
+        </label>
         <input
           type="text"
-          id="roomNumber"
-          name="roomNumber"
-          value={formData.roomNumber}
+          id="phong_id"
+          name="phong_id"
+          value={formData.phong_id}
           onChange={handleChange}
           required
           className="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
         />
       </div>
       <div className="form-group">
-        <label htmlFor="tenant" className="block text-sm font-medium text-gray-700">Người thuê:</label>
+        <label htmlFor="cu_dan_id" className="block text-sm font-medium text-gray-700">
+          ID Người thuê:
+        </label>
         <input
           type="text"
-          id="tenant"
-          name="tenant"
-          value={formData.tenant}
+          id="cu_dan_id"
+          name="cu_dan_id"
+          value={formData.cu_dan_id}
           onChange={handleChange}
           required
           className="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
         />
       </div>
       <div className="form-group">
-        <label htmlFor="contractType" className="block text-sm font-medium text-gray-700">Loại hợp đồng:</label>
+        <label htmlFor="Loai_hop_dong" className="block text-sm font-medium text-gray-700">
+          Loại hợp đồng:
+        </label>
         <select
-          id="contractType"
-          name="contractType"
-          value={formData.contractType}
+          id="Loai_hop_dong"
+          name="Loai_hop_dong"
+          value={formData.Loai_hop_dong}
           onChange={handleChange}
           required
           className="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
@@ -110,49 +106,41 @@ function ContractForm({ contract, onSubmit, onCancel }) {
         </select>
       </div>
       <div className="form-group">
-        <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">Ngày bắt đầu:</label>
+        <label htmlFor="Ngay_bat_dau" className="block text-sm font-medium text-gray-700">
+          Ngày bắt đầu:
+        </label>
         <input
           type="date"
-          id="startDate"
-          name="startDate"
-          value={formData.startDate}
+          id="Ngay_bat_dau"
+          name="Ngay_bat_dau"
+          value={formData.Ngay_bat_dau}
           onChange={handleChange}
           required
           className="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
         />
       </div>
       <div className="form-group">
-        <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">Ngày kết thúc:</label>
+        <label htmlFor="Ngay_ket_thuc" className="block text-sm font-medium text-gray-700">
+          Ngày kết thúc:
+        </label>
         <input
           type="date"
-          id="endDate"
-          name="endDate"
-          value={formData.endDate}
+          id="Ngay_ket_thuc"
+          name="Ngay_ket_thuc"
+          value={formData.Ngay_ket_thuc}
           onChange={handleChange}
-          required
           className="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
         />
       </div>
       <div className="form-group">
-        <label htmlFor="depositAmount" className="block text-sm font-medium text-gray-700">Tiền đặt cọc (VNĐ):</label>
+        <label htmlFor="Tien_thue_hang_thang" className="block text-sm font-medium text-gray-700">
+          Tiền thuê hàng tháng (VNĐ):
+        </label>
         <input
           type="number"
-          id="depositAmount"
-          name="depositAmount"
-          value={formData.depositAmount}
-          onChange={handleChange}
-          required
-          min="0"
-          className="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="monthlyRent" className="block text-sm font-medium text-gray-700">Tiền thuê hàng tháng (VNĐ):</label>
-        <input
-          type="number"
-          id="monthlyRent"
-          name="monthlyRent"
-          value={formData.monthlyRent}
+          id="Tien_thue_hang_thang"
+          name="Tien_thue_hang_thang"
+          value={formData.Tien_thue_hang_thang}
           onChange={handleChange}
           required
           min="0"
@@ -162,18 +150,28 @@ function ContractForm({ contract, onSubmit, onCancel }) {
       <div className="form-group flex items-center gap-2">
         <input
           type="checkbox"
-          name="isActive"
-          checked={formData.isActive}
+          name="Hieu_luc"
+          checked={formData.Hieu_luc}
           onChange={handleChange}
           className="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded"
         />
-        <label htmlFor="isActive" className="text-sm font-medium text-gray-700">Hiệu lực</label>
+        <label htmlFor="Hieu_luc" className="text-sm font-medium text-gray-700">
+          Hiệu lực
+        </label>
       </div>
       <div className="form-actions flex justify-end space-x-2">
-        <button type="submit" disabled={isSubmitting} className="bg-teal-700 text-white py-2 px-4 rounded-md hover:bg-teal-800">
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="bg-teal-700 text-white py-2 px-4 rounded-md hover:bg-teal-800"
+        >
           {isSubmitting ? "Đang xử lý..." : contract ? "Cập nhật" : "Thêm mới"}
         </button>
-        <button type="button" onClick={onCancel} className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600"
+        >
           Hủy
         </button>
       </div>

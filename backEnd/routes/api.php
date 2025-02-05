@@ -35,6 +35,8 @@ Route::get('/phongs', [PhongController::class, 'index']);
 Route::get('/phong/detailed', [PhongController::class, 'getDetailedInfo']);
 Route::get('/loaiphongs', [LoaiPhongController::class, 'index']);
 Route::post('/phong/dat-phong', [PhongController::class, 'datPhong']);
+Route::get('/rooms', [PhongController::class, 'getRooms']);
+Route::get('/phong-da-dat/{userId}', [PhongController::class, 'getBookedRoomsByUser']);
 
 
 //Dịch vụ
@@ -42,6 +44,8 @@ Route::get('/dichvus', [DichVuController::class, 'index']);
 
 //Phòng dịch vụ
 Route::get('/phong-dich-vu', [PhongDichVuController::class, 'index']);
+Route::get('/phong-dich-vu/chisodichvu', [PhongDichVuController::class, 'getServiceIndex']);
+
 
 //Cư dân
 Route::get('/cu-dan', [CuDanController::class, 'index']);
@@ -61,20 +65,22 @@ Route::post('/phanhoi', [PhanHoiController::class, 'store']);
 Route::put('/phanhoi/{id}', [PhanHoiController::class, 'update']);
 Route::delete('/phanhoi/{id}', [PhanHoiController::class, 'destroy']);
 Route::put('/phanhoi/confirm/{id}', [PhanHoiController::class, 'confirm']);
+Route::middleware('auth:api')->post('/phan-hoi/nguoi-dung', [PhanHoiController::class, 'storeFeedbackForUser']);
+
 
 //tài khoản
 Route::get('/tai-khoan', [TaiKhoanController::class, 'index']);
-// Route::post('/tai-khoan', [TaiKhoanController::class, 'store']);
 Route::put('/tai-khoan/{id}', [TaiKhoanController::class, 'update']);
 Route::post('/login', [TaiKhoanController::class, 'login']);
+Route::post('/register', [TaiKhoanController::class, 'register']);
+Route::get('/me', [TaiKhoanController::class, 'me']);
 Route::middleware('auth:api')->post('/logout', [TaiKhoanController::class, 'logout']);
-Route::middleware('auth:api')->get('/me', [TaiKhoanController::class, 'me']);
 Route::middleware('auth:api')->post('/change-password', [TaiKhoanController::class, 'changePassword']);
 
 
 
 //chức năng phân quyền ở tài khoản admin
-// Route::middleware(['auth:api', 'admin'])->group(function () {
+Route::middleware(['auth:api', 'admin'])->group(function () {
     //tài khoản
     Route::post('/tai-khoan', [TaiKhoanController::class, 'store']);
     Route::delete('/tai-khoan/{id}', [TaiKhoanController::class, 'destroy']);
@@ -115,5 +121,5 @@ Route::middleware('auth:api')->post('/change-password', [TaiKhoanController::cla
     Route::delete('/hoadon/{id}', [HoaDonController::class, 'destroy']); 
 
 
-// });
+});
 

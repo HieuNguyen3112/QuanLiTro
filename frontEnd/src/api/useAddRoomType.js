@@ -22,7 +22,7 @@ const useAddRoomType = () => {
           withCredentials: true,
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: token,
           },
         }
       );
@@ -30,8 +30,13 @@ const useAddRoomType = () => {
       console.log("Loại phòng mới đã được thêm:", response.data);
       return response.data;
     } catch (error) {
-      console.error("Lỗi khi thêm loại phòng:", error.response?.data || error.message);
-      throw new Error(error.response?.data?.message || "Không thể thêm loại phòng mới.");
+      console.error(
+        "Lỗi chi tiết khi thêm loại phòng:",
+        error.response?.data || error.message
+      );
+      throw new Error(
+        error.response?.data?.message || "Không thể thêm loại phòng mới."
+      );
     }
   };
 

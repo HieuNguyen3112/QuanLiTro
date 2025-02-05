@@ -4,7 +4,7 @@ import UserBillList from '../../features/UserManagement/UserBillList';
 import UserFeedback from '../../features/UserManagement/UserFeedBack'
 import UserSettings from '../../features/UserManagement/UserSettings';
 import UserBooking from '../../features/UserManagement/UserBooking';
-import UserRoomDetails from '../../features/UserManagement/UserRoomDetails'; // Import UserRoomDetails
+import UserRoomDetails from '../../features/UserManagement/UserRoomDetails';
 const DashboardUser = () => {
   const [activeSection, setActiveSection] = useState('welcome'); // Đặt 'welcome' là mặc định
 
@@ -12,14 +12,14 @@ const DashboardUser = () => {
     switch (activeSection) {
       case 'booking':
         return <UserBooking />;
+      case 'roomDetails':
+        return <UserRoomDetails />;
       case 'bills':
         return <UserBillList />;
       case 'feedback':
         return <UserFeedback />;
       case 'settings':
         return <UserSettings />;
-      case 'roomDetails':
-        return <UserRoomDetails />; // Hiển thị UserRoomDetails
       case 'welcome':
       default:
         return <div className="content p-4"><h2>Chào mừng bạn đã trở lại với IT Motel</h2></div>; // Hiển thị câu chào

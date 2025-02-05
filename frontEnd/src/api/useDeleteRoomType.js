@@ -12,7 +12,7 @@ const useDeleteRoomType = () => {
       // Gửi request DELETE để xóa loại phòng
       const response = await axios.delete(`http://127.0.0.1:8000/api/loaiphong/${id}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: token,
         },
       });
 

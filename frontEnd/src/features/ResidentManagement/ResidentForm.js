@@ -1,18 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import useAddResident from '../../api/useAddResident'; // Import hook gọi API thêm mới
-import useEditResident from '../../api/useEditResident'; // Import hook gọi API sửa
 
 function ResidentForm({ resident, onSubmit, onCancel }) {
-  const { addResident } = useAddResident(); // Gọi hàm addResident từ hook
-  const { editResident } = useEditResident(); // Gọi hàm editResident từ hook
-
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     dateOfBirth: '',
     idNumber: '',
     phone: '',
-    room: ''
+    room: '',
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false); // Trạng thái submit
@@ -20,53 +15,41 @@ function ResidentForm({ resident, onSubmit, onCancel }) {
   useEffect(() => {
     if (resident) {
       setFormData({
-        firstName: resident.Ho || '',
-        lastName: resident.Ten || '',
-        dateOfBirth: resident.Ngay_sinh || '',
-        idNumber: resident.CMND_CCCD || '',
-        phone: resident.So_dien_thoai || '',
-        room: resident.phong_id || ''
+        firstName: resident.firstName || '',
+        lastName: resident.lastName || '',
+        dateOfBirth: resident.dateOfBirth || '',
+        idNumber: resident.identityCard || '',
+        phone: resident.phoneNumber || '',
+        room: resident.roomId || '',
       });
     }
   }, [resident]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevData => ({
+    setFormData((prevData) => ({
       ...prevData,
-      [name]: value
+      [name]: value,
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Chuyển đổi dữ liệu form thành key phù hợp với backend
+    // Chuẩn bị dữ liệu để gửi
     const formattedData = {
-      Ho: formData.firstName,
-      Ten: formData.lastName,
-      Ngay_sinh: formData.dateOfBirth,
-      CMND_CCCD: formData.idNumber,
-      So_dien_thoai: formData.phone,
-      phong_id: formData.room
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      dateOfBirth: formData.dateOfBirth,
+      identityCard: formData.idNumber,
+      phoneNumber: formData.phone,
+      roomId: formData.room,
     };
 
-    try {
-      if (resident && resident.ID_CuDan) {
-        // Nếu có ID_CuDan => gọi API sửa
-        await editResident(resident.ID_CuDan, formattedData);
-      } else {
-        // Nếu không có ID_CuDan => gọi API thêm mới
-        await addResident(formattedData);
-      }
-      onSubmit(); // Callback khi thành công (ví dụ: cập nhật danh sách)
-    } catch (error) {
-      console.error("Lỗi khi lưu cư dân:", error.message);
-      alert("Lỗi khi lưu cư dân: " + error.message);
-    } finally {
-      setIsSubmitting(false);
-    }
+    // Gửi dữ liệu lên callback `onSubmit`
+    onSubmit(formattedData);
+    setIsSubmitting(false);
   };
 
   return (
@@ -132,7 +115,7 @@ function ResidentForm({ resident, onSubmit, onCancel }) {
         />
       </div>
       <div className="form-group">
-        <label htmlFor="room" className="block text-sm font-medium text-gray-700">Phòng:</label>
+        <label htmlFor="room" className="block text-sm font-medium text-gray-700">ID Phòng:</label>
         <input
           type="text"
           id="room"
@@ -144,16 +127,16 @@ function ResidentForm({ resident, onSubmit, onCancel }) {
         />
       </div>
       <div className="form-actions flex justify-end space-x-2">
-        <button 
-          type="submit" 
-          className="bg-teal-700 text-white py-2 px-4 rounded-md hover:bg-teal-800" 
+        <button
+          type="submit"
+          className="bg-teal-700 text-white py-2 px-4 rounded-md hover:bg-teal-800"
           disabled={isSubmitting}
         >
           {isSubmitting ? 'Đang xử lý...' : (resident ? 'Cập nhật' : 'Thêm mới')}
         </button>
-        <button 
-          type="button" 
-          className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600" 
+        <button
+          type="button"
+          className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600"
           onClick={onCancel}
         >
           Hủy

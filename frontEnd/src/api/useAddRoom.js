@@ -22,7 +22,7 @@ const useAddRoom = () => {
           withCredentials: true, // Gửi cookie kèm
           headers: {
             "Content-Type": "application/json", // Loại dữ liệu
-            Authorization: `Bearer ${token}`, // Truyền token xác thực
+            Authorization: token, // Truyền token xác thực
           },
         }
       );

@@ -1,36 +1,32 @@
 import React, { useState } from 'react';
-import BillCreationForm from './BillCreationForm';
 import BillList from './BillList';
-import { Toast } from '../../components/Toast';
+import BillForm from './BillForm';
 
 function BillManagement() {
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
-
-  const handleBillCreated = () => {
-    setToastMessage('Tạo tập hóa đơn thành công!');
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000);
-  };
+  const [activeTab, setActiveTab] = useState('billList');
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-1 bg-gray-50 p-6">
-        <BillCreationForm onSuccess={handleBillCreated} />
-        <div className="mt-8">
-          <BillList />
+      <div className="bg-white border-b">
+        <div className="flex gap-4 px-6">
+          <button
+            className={`py-3 px-4 font-medium border-b-2 transition-colors ${
+              activeTab === 'billList'
+                ? 'border-teal-700 text-teal-700'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+            onClick={() => setActiveTab('billList')}
+          >
+            Danh sách hóa đơn
+          </button>
+          
         </div>
       </div>
-      {showToast && (
-        <Toast 
-          message={toastMessage}
-          onClose={() => setShowToast(false)}
-          type="success"
-        />
-      )}
+      <div className="flex-1 bg-gray-50">
+        {activeTab === 'billList' ? <BillList /> : <BillForm />}
+      </div>
     </div>
   );
 }
 
 export default BillManagement;
-

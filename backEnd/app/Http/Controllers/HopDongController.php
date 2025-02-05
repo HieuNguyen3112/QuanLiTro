@@ -15,7 +15,7 @@ class HopDongController extends Controller
     public function index()
     {
         // Lấy danh sách hợp đồng với thông tin liên quan từ các bảng
-        $hopDongs = HopDong::with(['phong.loaiPhong', 'cuDan'])
+        $hopDongs = HopDong::with(['phong.loaiPhong', 'cuDan']) // Eager load mối quan hệ
             ->get()
             ->map(function ($hopDong) {
                 return [
@@ -27,11 +27,13 @@ class HopDongController extends Controller
                     'Ngay_ket_thuc' => $hopDong->Ngay_ket_thuc,
                     'Hieu_luc' => $hopDong->Hieu_luc,
                     'Tien_thue_hang_thang' => $hopDong->phong->loaiPhong->Gia_thue ?? "0.00", // Lấy tiền thuê hàng tháng
+                    'So_phong' => $hopDong->phong->So_phong ?? null, // Lấy thông tin số phòng
                 ];
             });
 
         return response()->json($hopDongs);
     }
+
 
 
     /**

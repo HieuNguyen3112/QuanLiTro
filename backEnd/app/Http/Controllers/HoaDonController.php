@@ -62,7 +62,6 @@ class HoaDonController extends Controller
             $validatedData = $request->validate([
                 'Ten_hoa_don' => 'required|string|max:255',
                 'phong_id' => 'required|exists:phong,ID_Phong',
-                'ThoiGian' => 'required|string',
                 'TongCong' => 'required|numeric|min:0',
                 'TrangThai' => 'required|in:Mới,Đã thanh toán'
             ]);
@@ -97,7 +96,6 @@ class HoaDonController extends Controller
             $validatedData = $request->validate([
                 'Ten_hoa_don' => 'nullable|string|max:255',
                 'phong_id' => 'nullable|exists:phong,ID_Phong',
-                'ThoiGian' => 'nullable|string',
                 'TongCong' => 'nullable|numeric|min:0',
                 'TrangThai' => 'nullable|in:Mới,Đã thanh toán'
             ]);

@@ -16,7 +16,7 @@ const useDeleteRoom = () => {
         `http://127.0.0.1:8000/api/phong/${roomId}`, // Đường dẫn API xóa phòng
         {
           headers: {
-            "Authorization": `Bearer ${token}`, // Gửi token trong headers
+            "Authorization": token, // Gửi token trong headers
           },
         }
       );

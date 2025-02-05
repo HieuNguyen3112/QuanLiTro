@@ -17,7 +17,7 @@ const useDeleteInvoice = () => {
         `http://127.0.0.1:8000/api/hoadon/${invoiceId}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: token,
             "Content-Type": "application/json",
           },
         }

@@ -13,7 +13,7 @@ const useDeleteService = () => {
         `http://127.0.0.1:8000/api/dichvu/${serviceId}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Gắn token vào header
+            Authorization: token, // Gắn token vào header
             "Content-Type": "application/json", // Xác định kiểu dữ liệu
           },
         }

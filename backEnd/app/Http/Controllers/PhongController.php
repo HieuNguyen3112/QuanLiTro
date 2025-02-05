@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Http\Request;
 use App\Models\Phong;
+use App\Models\CuDan;
 
 class PhongController extends Controller
 {
@@ -184,16 +186,18 @@ class PhongController extends Controller
      *
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
-    */
+     */
     public function datPhong(Request $request)
     {
         try {
             // Xác thực dữ liệu đầu vào
             $validatedData = $request->validate([
                 'Phong_id' => 'required|exists:phong,ID_Phong',
-                'CuDan_id' => 'nullable|exists:cu_dan,ID_CuDan',
-                'Ho' => 'nullable|string|max:50',
-                'Ten' => 'nullable|string|max:50',
+                'Ho' => 'required|string|max:50',
+                'Ten' => 'required|string|max:50',
+                'Ngay_sinh' => 'required|date',
+                'CMND_CCCD' => 'required|string|max:20|unique:cu_dan,CMND_CCCD',
+                'So_dien_thoai' => 'required|string|max:15',
                 'Ngay_bat_dau' => 'required|date|after_or_equal:today',
                 'Ngay_ket_thuc' => 'required|date|after:Ngay_bat_dau',
             ]);
@@ -207,27 +211,13 @@ class PhongController extends Controller
                 ], 400);
             }
 
-            // Xử lý trường hợp tài khoản chưa có CuDan_id
-            $taiKhoan = auth('api')->user(); // Lấy thông tin tài khoản đăng nhập
-            $cuDan = null;
+            // Lấy tài khoản hiện tại
+            $taiKhoan = auth('api')->user();
 
-            if (!$taiKhoan->CuDan_id) {
-                // Tạo mới cư dân nếu chưa tồn tại
-                $cuDan = \App\Models\CuDan::create([
-                    'Ho' => $validatedData['Ho'] ?? 'Chưa rõ',
-                    'Ten' => $validatedData['Ten'] ?? 'Chưa rõ',
-                    'CMND_CCCD' => '000000000', // Giá trị placeholder
-                    'So_dien_thoai' => '0000000000', // Giá trị placeholder
-                ]);
+            // Tạo hoặc cập nhật cư dân
+            $cuDan = CuDan::createOrUpdateCuDan($taiKhoan, $validatedData);
 
-                // Cập nhật tài khoản với CuDan_id mới
-                $taiKhoan->update(['CuDan_id' => $cuDan->ID_CuDan]);
-            } else {
-                // Lấy thông tin cư dân hiện có
-                $cuDan = \App\Models\CuDan::find($taiKhoan->CuDan_id);
-            }
-
-            // Tạo hợp đồng đặt phòng (hoặc ghi lại thông tin đặt phòng trong bảng liên quan)
+            // Tạo hợp đồng đặt phòng
             $hopDong = \App\Models\HopDong::create([
                 'phong_id' => $validatedData['Phong_id'],
                 'CuDan_id' => $cuDan->ID_CuDan,
@@ -253,6 +243,120 @@ class PhongController extends Controller
         }
     }
 
+
+
+
+
+    /**
+     * Lấy danh sách các phòng với thông tin cơ bản và loại phòng.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getRooms()
+    {
+        try {
+            // Lấy danh sách các phòng và thông tin loại phòng
+            $rooms = Phong::with('loaiPhong')->get();
+
+            // Định dạng lại dữ liệu nếu cần
+            $formattedRooms = $rooms->map(function ($room) {
+                return [
+                    'ID_Phong' => $room->ID_Phong,
+                    'So_phong' => $room->So_phong,
+                    'Loai_phong' => $room->loaiPhong->Ten_loai_phong ?? 'Chưa xác định',
+                    'Trang_thai' => $room->Trang_thai,
+                    'So_giuong' => $room->So_giuong,
+                    'So_tu_lanh' => $room->So_tu_lanh,
+                    'So_dieu_hoa' => $room->So_dieu_hoa,
+                ];
+            });
+
+            // Trả về JSON response
+            return response()->json([
+                'success' => true,
+                'data' => $formattedRooms,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi khi lấy danh sách phòng: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Tải hình lên Cloudinary.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function uploadImage(Request $request)
+    {
+        // Xác thực dữ liệu đầu vào
+        $validatedData = $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Chỉ chấp nhận file ảnh
+        ]);
+
+        try {
+            // Upload ảnh lên Cloudinary
+            $uploadedFileUrl = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::upload(
+                $request->file('image')->getRealPath(),
+                [
+                    'folder' => 'room_images', // Tên thư mục trong Cloudinary
+                ]
+            )->getSecurePath();
+
+            // Trả về URL của ảnh
+            return response()->json([
+                'success' => true,
+                'message' => 'Ảnh đã được upload thành công!',
+                'image_url' => $uploadedFileUrl,
+            ]);
+        } catch (\Exception $e) {
+            // Xử lý lỗi
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi khi upload ảnh: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Lấy danh sách phòng đã đặt của một user (cư dân).
+     *
+     * @param int $userId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getBookedRoomsByUser($userId)
+    {
+        try {
+            // Lấy danh sách các phòng mà user đã đặt thông qua hợp đồng
+            $bookedRooms = Phong::whereHas('hopDongs', function ($query) use ($userId) {
+                $query->where('cu_dan_id', $userId);
+            })
+            ->with(['loaiPhong']) // Lấy thông tin loại phòng liên quan
+            ->get();
+
+            // Kiểm tra nếu không có dữ liệu
+            if ($bookedRooms->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Không tìm thấy phòng nào cho user này.',
+                ], 404);
+            }
+
+            // Trả về danh sách phòng
+            return response()->json([
+                'success' => true,
+                'data' => $bookedRooms,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Đã xảy ra lỗi khi lấy danh sách phòng: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
 
 
 }

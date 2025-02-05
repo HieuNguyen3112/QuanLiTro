@@ -1,68 +1,54 @@
 import React, { useState, useEffect } from "react";
-import useAddRoom from "../../api/useAddRoom"; // Import custom hook để gọi API
 
-function RoomTypeForm({ roomType, onSubmitSuccess, onCancel }) {
-  const { addRoom } = useAddRoom(); // Hàm gọi API thêm phòng
-  const [loading, setLoading] = useState(false); // State loading
+function RoomTypeForm({ roomType, onSubmit, onCancel }) {
+  // State lưu dữ liệu form
   const [formData, setFormData] = useState({
-    name: "",
-    area: "",
-    price: "",
-    bedCount: "",
-    fridgeCount: "",
-    acCount: "",
+    Ten_loai_phong: "",
+    Dien_tich: "",
+    Gia_thue: "",
+    So_giuong_mac_dinh: 0,
+    So_tu_lanh_mac_dinh: 0,
+    So_dieu_hoa_mac_dinh: 0,
   });
 
-  // Cập nhật dữ liệu khi chỉnh sửa phòng
+  // Load dữ liệu vào form khi có loại phòng truyền vào (chỉnh sửa)
   useEffect(() => {
     if (roomType) {
-      setFormData(roomType);
+      setFormData({
+        Ten_loai_phong: roomType.Ten_loai_phong || "",
+        Dien_tich: roomType.Dien_tich || "",
+        Gia_thue: roomType.Gia_thue || "",
+        So_giuong_mac_dinh: roomType.So_giuong_mac_dinh || 0,
+        So_tu_lanh_mac_dinh: roomType.So_tu_lanh_mac_dinh || 0,
+        So_dieu_hoa_mac_dinh: roomType.So_dieu_hoa_mac_dinh || 0,
+      });
     }
   }, [roomType]);
 
-  // Xử lý thay đổi input
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: name === "name" ? value : parseFloat(value) || "",
+      [name]: value,
     }));
   };
 
-  // Xử lý submit form
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true); // Bắt đầu loading
-    try {
-      await addRoom({
-        SoPhong: formData.name,
-        LoaiPhong: "Standard", // Bạn có thể thay đổi loại phòng nếu cần
-        TrangThai: "Trống",
-        SoGiuong: formData.bedCount,
-        SoTuLanh: formData.fridgeCount,
-        SoDieuHoa: formData.acCount,
-      });
-
-      alert("Phòng mới đã được thêm thành công!");
-      onSubmitSuccess(); // Callback cập nhật lại danh sách phòng
-    } catch (error) {
-      alert("Lỗi khi thêm phòng mới: " + error.message);
-    } finally {
-      setLoading(false); // Kết thúc loading
-    }
+    onSubmit(formData); // Gửi dữ liệu lên callback
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-lg shadow-md">
       <div className="form-group">
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="Ten_loai_phong" className="block text-sm font-medium text-gray-700">
           Tên loại phòng:
         </label>
         <input
           type="text"
-          id="name"
-          name="name"
-          value={formData.name}
+          id="Ten_loai_phong"
+          name="Ten_loai_phong"
+          value={formData.Ten_loai_phong}
           onChange={handleChange}
           required
           className="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
@@ -70,82 +56,79 @@ function RoomTypeForm({ roomType, onSubmitSuccess, onCancel }) {
       </div>
 
       <div className="form-group">
-        <label htmlFor="area" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="Dien_tich" className="block text-sm font-medium text-gray-700">
           Diện tích (m²):
         </label>
         <input
           type="number"
-          id="area"
-          name="area"
-          value={formData.area}
+          id="Dien_tich"
+          name="Dien_tich"
+          value={formData.Dien_tich}
           onChange={handleChange}
           required
-          min="0"
-          step="0.01"
           className="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
         />
       </div>
 
       <div className="form-group">
-        <label htmlFor="price" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="Gia_thue" className="block text-sm font-medium text-gray-700">
           Giá thuê mặc định (VNĐ):
         </label>
         <input
           type="number"
-          id="price"
-          name="price"
-          value={formData.price}
+          id="Gia_thue"
+          name="Gia_thue"
+          value={formData.Gia_thue}
           onChange={handleChange}
           required
-          min="0"
           className="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
         />
       </div>
 
       <div className="form-group">
-        <label htmlFor="bedCount" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="So_giuong_mac_dinh" className="block text-sm font-medium text-gray-700">
           Số giường mặc định:
         </label>
         <input
           type="number"
-          id="bedCount"
-          name="bedCount"
-          value={formData.bedCount}
+          id="So_giuong_mac_dinh"
+          name="So_giuong_mac_dinh"
+          value={formData.So_giuong_mac_dinh}
           onChange={handleChange}
-          required
           min="0"
+          required
           className="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
         />
       </div>
 
       <div className="form-group">
-        <label htmlFor="fridgeCount" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="So_tu_lanh_mac_dinh" className="block text-sm font-medium text-gray-700">
           Số tủ lạnh mặc định:
         </label>
         <input
           type="number"
-          id="fridgeCount"
-          name="fridgeCount"
-          value={formData.fridgeCount}
+          id="So_tu_lanh_mac_dinh"
+          name="So_tu_lanh_mac_dinh"
+          value={formData.So_tu_lanh_mac_dinh}
           onChange={handleChange}
-          required
           min="0"
+          required
           className="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
         />
       </div>
 
       <div className="form-group">
-        <label htmlFor="acCount" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="So_dieu_hoa_mac_dinh" className="block text-sm font-medium text-gray-700">
           Số điều hòa mặc định:
         </label>
         <input
           type="number"
-          id="acCount"
-          name="acCount"
-          value={formData.acCount}
+          id="So_dieu_hoa_mac_dinh"
+          name="So_dieu_hoa_mac_dinh"
+          value={formData.So_dieu_hoa_mac_dinh}
           onChange={handleChange}
-          required
           min="0"
+          required
           className="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
         />
       </div>
@@ -154,9 +137,8 @@ function RoomTypeForm({ roomType, onSubmitSuccess, onCancel }) {
         <button
           type="submit"
           className="bg-teal-700 text-white py-2 px-4 rounded-md hover:bg-teal-800"
-          disabled={loading}
         >
-          {loading ? "Đang xử lý..." : roomType ? "Cập nhật" : "Thêm mới"}
+          {roomType ? "Cập nhật" : "Thêm mới"}
         </button>
         <button
           type="button"

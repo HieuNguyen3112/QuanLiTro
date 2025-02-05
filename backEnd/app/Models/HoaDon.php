@@ -31,7 +31,6 @@ class HoaDon extends Model
     protected $fillable = [
         'Ten_hoa_don', 
         'phong_id', 
-        'ThoiGian', 
         'TongCong', 
         'TrangThai'
     ];

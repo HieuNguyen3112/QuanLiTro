@@ -1,30 +1,57 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Trash2, Check, Eye, MessageCircle } from "react-feather";
 import Modal from "../../components/Modal";
-import useFetchFeedbacks from "../../api/useFetchFeedbacks"; // Import custom hook
-import { format } from "date-fns"; // Import thư viện format từ date-fns
+import { format } from "date-fns";
 
-function FeedbackManagement() {
-  const { feedbacks, isLoading, fetchError, fetchFeedbacks } = useFetchFeedbacks(); // Dữ liệu từ API
+const FeedbackManagement = () => {
+  // Dữ liệu tĩnh các phản hồi
+  const [feedbacks, setFeedbacks] = useState([
+    {
+      id: 1,
+      created_at: "2024-12-01T10:30:00",
+      NguoiGui: "Nguyen Van Anh",
+      Phong_id: "101",
+      TieuDe: "Vấn đề về điện nước",
+      NoiDung: "Đèn phòng thường xuyên chập chờn. Vui lòng kiểm tra lại.",
+      TrangThai: "Chưa xử lý",
+    },
+    {
+      id: 2,
+      created_at: "2024-12-02T14:15:00",
+      NguoiGui: "Tran Thi Hoa",
+      Phong_id: "102",
+      TieuDe: "Tiếng ồn từ khu vực xung quanh",
+      NoiDung: "Khu vực xung quanh phòng ồn ào vào buổi tối, gây khó chịu.",
+      TrangThai: "Đã xử lý",
+    },
+    {
+      id: 3,
+      created_at: "2024-12-03T08:45:00",
+      NguoiGui: "Le Van Minh",
+      Phong_id: "105",
+      TieuDe: "Vệ sinh không đảm bảo",
+      NoiDung: "Phòng vệ sinh có mùi khó chịu, đề nghị làm vệ sinh định kỳ.",
+      TrangThai: "Chưa xử lý",
+    },
+  ]);
+
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isRespondModalOpen, setIsRespondModalOpen] = useState(false);
   const [selectedFeedback, setSelectedFeedback] = useState(null);
   const [response, setResponse] = useState("");
 
-  useEffect(() => {
-    fetchFeedbacks(); // Fetch dữ liệu khi component mount
-  }, []);
-
   const handleDelete = (id) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa phản hồi này?")) {
-      console.log(`Xóa phản hồi với ID: ${id}`);
-      // TODO: Gọi API xóa phản hồi tại đây
+      setFeedbacks((prev) => prev.filter((item) => item.id !== id));
     }
   };
 
   const handleApprove = (id) => {
-    console.log(`Đánh dấu đã xử lý phản hồi với ID: ${id}`);
-    // TODO: Gọi API để cập nhật trạng thái phản hồi
+    setFeedbacks((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, TrangThai: "Đã xử lý" } : item
+      )
+    );
   };
 
   const handleView = (item) => {
@@ -39,8 +66,13 @@ function FeedbackManagement() {
   };
 
   const submitResponse = () => {
-    console.log("Gửi phản hồi:", response);
-    // TODO: Gọi API để gửi phản hồi
+    setFeedbacks((prev) =>
+      prev.map((item) =>
+        item.id === selectedFeedback.id
+          ? { ...item, response }
+          : item
+      )
+    );
     setIsRespondModalOpen(false);
   };
 
@@ -49,9 +81,6 @@ function FeedbackManagement() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold">Danh sách phản hồi của cư dân</h1>
       </div>
-
-      {isLoading && <p>Đang tải dữ liệu...</p>}
-      {fetchError && <p className="text-red-500">{fetchError}</p>}
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <table className="w-full">
@@ -150,8 +179,25 @@ function FeedbackManagement() {
           </div>
         )}
       </Modal>
+
+      {/* Modal Phản hồi */}
+      <Modal isOpen={isRespondModalOpen} onClose={() => setIsRespondModalOpen(false)} title="Phản hồi">
+        <textarea
+          className="w-full p-2 border rounded-md"
+          value={response}
+          onChange={(e) => setResponse(e.target.value)}
+          rows={4}
+          placeholder="Nhập phản hồi của bạn tại đây..."
+        />
+        <button
+          onClick={submitResponse}
+          className="mt-4 bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700"
+        >
+          Gửi phản hồi
+        </button>
+      </Modal>
     </div>
   );
-}
+};
 
 export default FeedbackManagement;

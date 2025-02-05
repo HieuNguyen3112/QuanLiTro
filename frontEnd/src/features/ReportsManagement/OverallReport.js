@@ -1,36 +1,70 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
 
 function OverallReport() {
-  const [reports] = useState([
+  // Dữ liệu tĩnh từ hợp đồng
+  const contracts = [
     {
-      id: 1,
-      room: '1',
-      roomFee: 5000000,
-      water: 0,
-      parking: 6000,
-      bathroom: 200000,
-      internet: 0,
-      laundry: 0,
-      commonService: 0,
-      garbage: 0,
-      electric: 350000
-    }
-  ]);
+      ID_HopDong: 1,
+      phong_id: "101",
+      So_phong: "101",
+      Tien_thue_hang_thang: 5000000,
+    },
+    {
+      ID_HopDong: 2,
+      phong_id: "102",
+      So_phong: "102",
+      Tien_thue_hang_thang: 4500000,
+    },
+    {
+      ID_HopDong: 3,
+      phong_id: "105",
+      So_phong: "105",
+      Tien_thue_hang_thang: 6000000,
+    },
+    {
+      ID_HopDong: 4,
+      phong_id: "107",
+      So_phong: "107",
+      Tien_thue_hang_thang: 5500000,
+    },
+    {
+      ID_HopDong: 5,
+      phong_id: "110",
+      So_phong: "110",
+      Tien_thue_hang_thang: 4800000,
+    },
+  ];
+
+  // Giả lập các dịch vụ đi kèm
+  const services = [
+    { phong_id: "101", dich_vu: { Nuoc: 500000, Dien: 700000 } },
+    { phong_id: "102", dich_vu: { Nuoc: 450000, Dien: 650000 } },
+    { phong_id: "105", dich_vu: { Nuoc: 600000, Dien: 800000 } },
+    { phong_id: "107", dich_vu: { Nuoc: 550000, Dien: 750000 } },
+    { phong_id: "110", dich_vu: { Nuoc: 480000, Dien: 720000 } },
+  ];
+
+  const [reports, setReports] = useState([]);
+
+  useEffect(() => {
+    // Tổng hợp dữ liệu từ hợp đồng và dịch vụ
+    const formattedReports = contracts.map((contract) => {
+      const service = services.find((s) => s.phong_id === contract.phong_id)?.dich_vu || {};
+      return {
+        id: contract.ID_HopDong,
+        room: contract.phong_id,
+        roomNumber: contract.So_phong,
+        roomFee: contract.Tien_thue_hang_thang,
+        water: service.Nuoc || 0,
+        electric: service.Dien || 0,
+      };
+    });
+    setReports(formattedReports);
+  }, []);
 
   const calculateTotal = () => {
     return reports.reduce((acc, report) => {
-      return (
-        acc +
-        report.roomFee +
-        report.water +
-        report.parking +
-        report.bathroom +
-        report.internet +
-        report.laundry +
-        report.commonService +
-        report.garbage +
-        report.electric
-      );
+      return acc + report.roomFee + report.water + report.electric;
     }, 0);
   };
 
@@ -49,16 +83,12 @@ function OverallReport() {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">STT</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Phòng</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">ID Phòng</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Số phòng</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Tiền phòng</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Nước</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Gửi xe</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Vệ sinh riêng</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Internet</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Giặt là</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Dịch vụ chung</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Rác thải</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Điện</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Tổng cộng</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -66,20 +96,20 @@ function OverallReport() {
               <tr key={report.id}>
                 <td className="px-4 py-3 text-sm">{index + 1}</td>
                 <td className="px-4 py-3 text-sm">{report.room}</td>
-                <td className="px-4 py-3 text-sm">{report.roomFee.toLocaleString()}</td>
-                <td className="px-4 py-3 text-sm">{report.water.toLocaleString()}</td>
-                <td className="px-4 py-3 text-sm">{report.parking.toLocaleString()}</td>
-                <td className="px-4 py-3 text-sm">{report.bathroom.toLocaleString()}</td>
-                <td className="px-4 py-3 text-sm">{report.internet.toLocaleString()}</td>
-                <td className="px-4 py-3 text-sm">{report.laundry.toLocaleString()}</td>
-                <td className="px-4 py-3 text-sm">{report.commonService.toLocaleString()}</td>
-                <td className="px-4 py-3 text-sm">{report.garbage.toLocaleString()}</td>
-                <td className="px-4 py-3 text-sm">{report.electric.toLocaleString()}</td>
+                <td className="px-4 py-3 text-sm">{report.roomNumber}</td>
+                <td className="px-4 py-3 text-sm">{report.roomFee.toLocaleString()} VND</td>
+                <td className="px-4 py-3 text-sm">{report.water.toLocaleString()} VND</td>
+                <td className="px-4 py-3 text-sm">{report.electric.toLocaleString()} VND</td>
+                <td className="px-4 py-3 text-sm">
+                  {(report.roomFee + report.water + report.electric).toLocaleString()} VND
+                </td>
               </tr>
             ))}
             <tr className="bg-gray-50 font-medium">
-              <td colSpan={2} className="px-4 py-3 text-sm">Tổng doanh thu:</td>
-              <td colSpan={9} className="px-4 py-3 text-sm">
+              <td colSpan={3} className="px-4 py-3 text-sm">
+                Tổng doanh thu:
+              </td>
+              <td colSpan={4} className="px-4 py-3 text-sm">
                 {calculateTotal().toLocaleString()} VND
               </td>
             </tr>

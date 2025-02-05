@@ -5,11 +5,13 @@ import RoomTypeForm from "./RoomTypeForm";
 import useFetchRoomType from "../../api/useFetchRoomType";
 import useAddRoomType from "../../api/useAddRoomType";
 import useDeleteRoomType from "../../api/useDeleteRoomType";
+import useEditRoomType from "../../api/useEditRoomType";
 
 function RoomTypeList() {
   const { roomTypes, isLoading, fetchError, fetchRoomTypes } = useFetchRoomType();
   const { addRoomType } = useAddRoomType();
   const { deleteRoomType } = useDeleteRoomType();
+  const { editRoomType } = useEditRoomType();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRoomType, setEditingRoomType] = useState(null);
@@ -42,28 +44,56 @@ function RoomTypeList() {
   };
 
   const handleSubmit = async (formData) => {
+    console.log("handleSubmit được gọi với dữ liệu:", formData);
+
     try {
       // Chuẩn bị dữ liệu gửi API, chuyển đổi kiểu dữ liệu
       const newRoomTypeData = {
-        Ten_loai_phong: formData.Ten_loai_phong,
+        Ten_loai_phong: formData.Ten_loai_phong.trim(),
         Dien_tich: Number(formData.Dien_tich),
         Gia_thue: Number(formData.Gia_thue),
         So_giuong_mac_dinh: Number(formData.So_giuong_mac_dinh),
         So_tu_lanh_mac_dinh: Number(formData.So_tu_lanh_mac_dinh),
         So_dieu_hoa_mac_dinh: Number(formData.So_dieu_hoa_mac_dinh),
       };
-  
-      console.log("Dữ liệu gửi lên:", newRoomTypeData); // Log để debug
-  
-      await addRoomType(newRoomTypeData); // Gọi API thêm loại phòng
-      fetchRoomTypes(); // Tải lại danh sách loại phòng
-      closeModal(); // Đóng modal sau khi thành công
+
+      // Log kiểu dữ liệu từng thuộc tính để theo dõi
+      console.log("\u{1F449} Kiểu dữ liệu của từng thuộc tính trong dữ liệu gửi đi:");
+      Object.keys(newRoomTypeData).forEach((key) => {
+        console.log(`  ${key}:`, newRoomTypeData[key], `(Type: ${typeof newRoomTypeData[key]})`);
+      });
+
+      // Kiểm tra tính hợp lệ của dữ liệu
+      if (
+        !newRoomTypeData.Ten_loai_phong ||
+        isNaN(newRoomTypeData.Dien_tich) ||
+        isNaN(newRoomTypeData.Gia_thue) ||
+        isNaN(newRoomTypeData.So_giuong_mac_dinh) ||
+        isNaN(newRoomTypeData.So_tu_lanh_mac_dinh) ||
+        isNaN(newRoomTypeData.So_dieu_hoa_mac_dinh)
+      ) {
+        alert("Dữ liệu không hợp lệ. Vui lòng kiểm tra lại!");
+        console.error("\u{26A0} Dữ liệu không hợp lệ:", newRoomTypeData);
+        return;
+      }
+
+      console.log("\u{1F4E6} Dữ liệu hợp lệ sẽ được gửi đi:", newRoomTypeData);
+
+      if (editingRoomType) {
+        // Sửa loại phòng nếu đang chỉnh sửa
+        await editRoomType(editingRoomType.ID_LoaiPhong, newRoomTypeData);
+      } else {
+        // Thêm loại phòng mới nếu không chỉnh sửa
+        await addRoomType(newRoomTypeData);
+      }
+
+      fetchRoomTypes(); // Cập nhật danh sách loại phòng
+      closeModal(); // Đóng modal
     } catch (error) {
-      console.error("Lỗi khi thêm loại phòng:", error.message);
-      alert("Lỗi khi thêm loại phòng: " + error.message);
+      console.error("Lỗi khi lưu loại phòng:", error.response?.data || error.message);
+      alert("Lỗi khi lưu loại phòng: " + (error.response?.data?.message || error.message));
     }
   };
-  
 
   return (
     <div className="content">
